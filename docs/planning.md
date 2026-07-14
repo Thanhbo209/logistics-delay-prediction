@@ -55,9 +55,16 @@ score.
 ## 6. Decision that echoes forward
 
 Because the brief requires **explaining "why,"** we commit now to an **explainable,
-tree-based model** (Random Forest / gradient-boosted trees) rather than a black box, so
-that SHAP can produce faithful per-prediction explanations later. This is the one upstream
-choice driven by a downstream requirement.
+tree-based model** (Random Forest / gradient-boosted trees) rather than a black box.
+
+**Explainability method — feature importances + permutation importance (not SHAP).**
+The brief allows *"feature importances or SHAP"* and marks SHAP optional. We deliberately
+skip SHAP: on the project's environment (Windows + Python 3.14) `shap` has no prebuilt
+wheel and would require a source build, an unjustified risk for a 3-day prototype. A
+tree model's built-in `feature_importances_` (global) plus scikit-learn
+`permutation_importance` (global, model-agnostic) and per-prediction driver analysis give
+us faithful, defensible explanations with zero dependency risk. SHAP is noted as a
+future enhancement (best run on Linux/macOS or Python ≤3.12).
 
 ---
 
@@ -67,5 +74,5 @@ choice driven by a downstream requirement.
 |---|---|
 | Predict congestion/delay likelihood | §2 binary classifier |
 | Confidence score | §3 predicted probability |
-| Explain why | §6 tree model + SHAP (later phase) |
+| Explain why | §6 tree model + feature/permutation importance (SHAP skipped — see §6) |
 | Actionability | Recommendations mapped from top drivers (later phase) |
