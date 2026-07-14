@@ -1,70 +1,60 @@
 # Planning — Port Congestion / Shipment Delay Prediction
 
-*Safiri Ai 3-day take-home. This note is the locked specification for the project and
-becomes Sections 1–2 of the final report.*
+*Safiri Ai 3-day take-home. Locked spec; becomes Sections 1–2 of the final report.
+For dataset generation details, see `dataset_design.md`.*
 
 ## 1. Problem statement
 
-Port congestion causes shipment delays that cascade into missed delivery windows, higher
-costs, and lost reliability. This project builds a prototype that, given the current
-operating conditions for an inbound shipment (vessel type, offshore queue, port
-utilization, weather, and the route's recent delay history), estimates **how likely that
-shipment is to be highly delayed**, reports a **confidence score**, and **explains the
-factors driving the prediction** — so a logistics manager can act early (notify the
-customer, reschedule labor, or reroute cargo).
+Given an inbound shipment's operating conditions (vessel type, offshore queue, port
+utilization, weather, route's recent delay history), predict **how likely it is to be
+highly delayed**, report a **confidence score**, and **explain the driving factors** —
+so a logistics manager can act early (notify the customer, reschedule labor, reroute cargo).
 
-## 2. Prediction target (what "1" means)
+## 2. Prediction target
 
-- **Framing:** binary classification. `delay_flag ∈ {1 = highly delayed, 0 = not}`.
-- **Definition of "highly delayed":** the shipment's delay exceeds **24 hours** beyond
-  schedule. A full extra day is the point where cascading supply-chain costs (storage,
-  re-planning, SLA penalties) become material, so it is a meaningful operational boundary.
-- **How ground truth is produced (synthetic):** we simulate a continuous `delay_hours`
-  from a documented formula over the features plus small Gaussian noise, then apply the
-  24h threshold to get `delay_flag`. Keeping the latent `delay_hours` lets us later add a
-  regression view without changing the data.
-- **Class balance target:** positives (delayed) should be a realistic **minority (~30–45%)**
-  — not 50/50, not 5/95. We tune the threshold/noise to land in this band.
+- **Framing:** binary classification, `is_delayed ∈ {0, 1}`.
+- **"Delayed" means:** simulated delay exceeds **24 hours**. Chosen as the point where
+  cascading costs (storage, re-planning, SLA penalties) become material — an operational
+  judgment call, not derived from data.
+- **Ground truth:** a continuous `delay_hours` is simulated from a documented formula
+  (see `dataset_design.md`), then thresholded at 24h. Keeping `delay_hours` allows a
+  future regression view without regenerating data.
+- **Class balance target:** delayed should be a realistic **minority (~30–45%)** —
+  congestion is the exception, not the norm. Currently **37%**.
 
 ## 3. Confidence score
 
-The confidence score is the model's **predicted probability of delay** (`predict_proba`),
-a value in [0, 1]. We will optionally calibrate it later so that "0.8" genuinely means
-"~80% of such shipments are delayed." We report the probability, never a raw, unbounded
-score.
+The model's `predict_proba` output — a probability in [0, 1], not a raw score. Reported
+as-is; calibration is a possible future step if predicted probabilities prove unreliable.
 
-## 4. Success metrics & evaluation
+## 4. Evaluation
 
-- **Primary:** ROC-AUC (ranking quality) and F1 on the positive/delayed class.
-- **Secondary:** confusion matrix at the 0.5 threshold for interpretability.
-- **Method:** **stratified k-fold cross-validation** (5-fold). With only 300 rows a single
-  train/test split is high-variance; CV gives an honest estimate and preserves class ratio.
-- **Why not accuracy:** the classes are imbalanced, so accuracy would reward "predict
-  on-time always." AUC and F1 reflect the ability to actually catch delays.
+- **Primary:** ROC-AUC and F1 (positive/delayed class).
+- **Secondary:** confusion matrix at the 0.5 threshold, for interpretability.
+- **Method:** stratified 5-fold cross-validation. With 500 rows, a single train/test
+  split is high-variance; CV gives an honest estimate and preserves class ratio per fold.
+- **Why not accuracy:** classes are imbalanced (37/63), so "always predict on-time"
+  would score well on accuracy while catching zero delays. AUC/F1 measure actual
+  discrimination.
 
-## 5. Assumptions (explicitly stated)
+## 5. Assumptions
 
-- The dataset is **synthetic** (permitted by the brief); its generation logic is fully
-  documented and seeded for reproducibility.
-- All features are **known at prediction time** (before the outcome), so there is no leakage.
-- A single, generic port is modeled; per-port variation is noted as future work.
-- Each shipment outcome is treated as **independent**.
-- Ground truth follows the simulated formula in §2; real operations would add unmodeled
-  factors (labor actions, customs, mechanical failures), acknowledged as a limitation.
+- Dataset is synthetic (permitted by the brief); generation is documented and seeded.
+- All features are known before the outcome — no leakage.
+- Single, generic port modeled; per-port variation is future work.
+- Each shipment is treated as independent.
+- Ground truth follows the simulated formula; real operations have unmodeled factors
+  (labor actions, customs, mechanical failures) — acknowledged as a limitation.
 
-## 6. Decision that echoes forward
+## 6. Model choice
 
-Because the brief requires **explaining "why,"** we commit now to an **explainable,
-tree-based model** (Random Forest / gradient-boosted trees) rather than a black box.
+Tree-based model (Random Forest), not a black box — the brief requires explaining "why."
 
-**Explainability method — feature importances + permutation importance (not SHAP).**
-The brief allows *"feature importances or SHAP"* and marks SHAP optional. We deliberately
-skip SHAP: on the project's environment (Windows + Python 3.14) `shap` has no prebuilt
-wheel and would require a source build, an unjustified risk for a 3-day prototype. A
-tree model's built-in `feature_importances_` (global) plus scikit-learn
-`permutation_importance` (global, model-agnostic) and per-prediction driver analysis give
-us faithful, defensible explanations with zero dependency risk. SHAP is noted as a
-future enhancement (best run on Linux/macOS or Python ≤3.12).
+**Explainability: `feature_importances_` + permutation importance, not SHAP.** The brief
+allows either. SHAP has no prebuilt wheel for this project's environment (Windows,
+Python 3.14) and would need a source build — unjustified risk for a 3-day prototype.
+sklearn's built-in tools give faithful, dependency-free explanations. SHAP noted as a
+future enhancement if run on Linux/macOS or Python ≤3.12.
 
 ---
 
@@ -74,5 +64,5 @@ future enhancement (best run on Linux/macOS or Python ≤3.12).
 |---|---|
 | Predict congestion/delay likelihood | §2 binary classifier |
 | Confidence score | §3 predicted probability |
-| Explain why | §6 tree model + feature/permutation importance (SHAP skipped — see §6) |
-| Actionability | Recommendations mapped from top drivers (later phase) |
+| Explain why | §6 tree model + feature/permutation importance |
+| Actionability | Top drivers mapped to recommendations (later phase) |
