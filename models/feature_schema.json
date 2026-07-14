@@ -1,0 +1,14 @@
+{
+  "feature_columns": [
+    "queue_length",
+    "port_utilization",
+    "historical_avg_delay",
+    "arrival_hour",
+    "vessel_type_Bulk",
+    "vessel_type_Container",
+    "vessel_type_Tanker",
+    "weather_Clear",
+    "weather_Rain",
+    "weather_Storm"
+  ]
+}
