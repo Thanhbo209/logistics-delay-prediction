@@ -1,0 +1,86 @@
+{
+  "built_in": [
+    {
+      "feature": "queue_length",
+      "importance": 0.314988
+    },
+    {
+      "feature": "historical_avg_delay",
+      "importance": 0.289666
+    },
+    {
+      "feature": "port_utilization",
+      "importance": 0.141103
+    },
+    {
+      "feature": "arrival_hour",
+      "importance": 0.077482
+    },
+    {
+      "feature": "weather_Storm",
+      "importance": 0.04844
+    },
+    {
+      "feature": "weather_Clear",
+      "importance": 0.046713
+    },
+    {
+      "feature": "vessel_type_Tanker",
+      "importance": 0.02937
+    },
+    {
+      "feature": "vessel_type_Container",
+      "importance": 0.026814
+    },
+    {
+      "feature": "weather_Rain",
+      "importance": 0.014151
+    },
+    {
+      "feature": "vessel_type_Bulk",
+      "importance": 0.011274
+    }
+  ],
+  "permutation": [
+    {
+      "feature": "queue_length",
+      "importance": 0.161739
+    },
+    {
+      "feature": "historical_avg_delay",
+      "importance": 0.116521
+    },
+    {
+      "feature": "port_utilization",
+      "importance": 0.015141
+    },
+    {
+      "feature": "weather_Storm",
+      "importance": 0.003693
+    },
+    {
+      "feature": "weather_Clear",
+      "importance": 0.002465
+    },
+    {
+      "feature": "vessel_type_Tanker",
+      "importance": 0.000577
+    },
+    {
+      "feature": "arrival_hour",
+      "importance": 0.00036
+    },
+    {
+      "feature": "vessel_type_Container",
+      "importance": 0.000255
+    },
+    {
+      "feature": "vessel_type_Bulk",
+      "importance": 0.0
+    },
+    {
+      "feature": "weather_Rain",
+      "importance": 0.0
+    }
+  ]
+}
