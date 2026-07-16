@@ -8,7 +8,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, f1_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 DATA_PATH = PROJECT_ROOT / "src" / "data" / "port_data.csv"
@@ -19,9 +18,11 @@ N_SPLITS = 5
 
 LEAKAGE_COLUMNS = ["delay_hours", "is_delayed"]
 
+
 # load .csv file
 def load_data() -> pd.DataFrame:
     return pd.read_csv(DATA_PATH)
+
 
 # load features X and labels y
 def build_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
@@ -29,6 +30,7 @@ def build_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     y = encoded["is_delayed"]
     X = encoded.drop(columns=LEAKAGE_COLUMNS)
     return X, y
+
 
 # 5-fold cross validation
 def cross_validate(X: pd.DataFrame, y: pd.Series) -> dict:
@@ -73,6 +75,7 @@ def cross_validate(X: pd.DataFrame, y: pd.Series) -> dict:
             "tp": int(tp),
         },
     }
+
 
 # train final model on all data
 def fit_final_model(X: pd.DataFrame, y: pd.Series) -> RandomForestClassifier:

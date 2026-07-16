@@ -49,6 +49,7 @@ WEATHER_PROBABILITIES = [
 
 rng = np.random.default_rng(RANDOM_SEED)
 
+
 def generate_dtset(rng: np.random.Generator) -> pd.DataFrame:
     vessel_type = rng.choice(
         VESSEL_TYPES,
@@ -97,6 +98,7 @@ def generate_dtset(rng: np.random.Generator) -> pd.DataFrame:
         }
     )
 
+
 def calculate_delay(df: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
     weather_delay = df["weather"].map(WEATHER_DELAY)
 
@@ -104,15 +106,10 @@ def calculate_delay(df: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
 
     queue_effect = df["queue_length"] * 0.8 * OPERATIONAL_EFFECT_SCALE
 
-    utilization_effect = (
-        (df["port_utilization"] - 60) * 0.25 * OPERATIONAL_EFFECT_SCALE
-    )
+    utilization_effect = (df["port_utilization"] - 60) * 0.25 * OPERATIONAL_EFFECT_SCALE
 
     interaction_effect = (
-        df["queue_length"]
-        * (df["port_utilization"] / 100)
-        * 0.4
-        * OPERATIONAL_EFFECT_SCALE
+        df["queue_length"] * (df["port_utilization"] / 100) * 0.4 * OPERATIONAL_EFFECT_SCALE
     )
 
     noise = rng.normal(
@@ -133,11 +130,10 @@ def calculate_delay(df: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
 
     df["delay_hours"] = delay_hours.round(2)
 
-    df["is_delayed"] = (
-        df["delay_hours"] > DELAY_THRESHOLD
-    ).astype(int)
+    df["is_delayed"] = (df["delay_hours"] > DELAY_THRESHOLD).astype(int)
 
     return df
+
 
 def save_dataset(df: pd.DataFrame):
     OUTPUT_PATH.parent.mkdir(
@@ -149,6 +145,7 @@ def save_dataset(df: pd.DataFrame):
         OUTPUT_PATH,
         index=False,
     )
+
 
 def print_summary(df: pd.DataFrame):
     print("=" * 60)
@@ -178,6 +175,7 @@ def main():
     save_dataset(df)
 
     print_summary(df)
+
 
 if __name__ == "__main__":
     main()

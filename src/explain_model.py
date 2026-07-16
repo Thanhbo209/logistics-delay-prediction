@@ -64,8 +64,7 @@ SANITY_CHECK_FEATURE = "arrival_hour"
 # terminology ("importance", "coefficient") and raw numbers in favor of plain language.
 NUMERIC_PHRASES_HIGH = {
     "queue_length": (
-        "Queue length is significantly higher than normal, indicating heavy "
-        "congestion at the port."
+        "Queue length is significantly higher than normal, indicating heavy congestion at the port."
     ),
     "port_utilization": (
         "The port is operating close to full capacity, making delays more likely."
@@ -409,8 +408,7 @@ def _check_signal_agreement(builtin_ranking: list[dict], permutation_ranking: li
     print("=" * 49)
     print(f"Built-in importance:     rank {builtin_rank}/{total}  (value={builtin_value:.3f})")
     print(
-        f"Permutation importance:  rank {permutation_rank}/{total}  "
-        f"(value={permutation_value:.3f})"
+        f"Permutation importance:  rank {permutation_rank}/{total}  (value={permutation_value:.3f})"
     )
     print()
 
@@ -427,8 +425,7 @@ def _check_signal_agreement(builtin_ranking: list[dict], permutation_ranking: li
         )
     elif permutation_is_near_zero and not builtin_is_relatively_high:
         print(
-            f"OK: both methods agree '{SANITY_CHECK_FEATURE}' carries little "
-            "signal, as expected."
+            f"OK: both methods agree '{SANITY_CHECK_FEATURE}' carries little signal, as expected."
         )
     else:
         print(
